@@ -11,6 +11,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
+using AutoMapper;
+using Newtonsoft.Json.Serialization;
 
 namespace CommandAPI
 {
@@ -29,7 +31,11 @@ namespace CommandAPI
             builder.UserID = Configuration["user id"];
             builder.Password = Configuration["password"];
             services.AddDbContext<CommandContext>(opt => opt.UseSqlServer(builder.ConnectionString));
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(s =>
+            {
+                s.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            });
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //services.AddScoped<ICommandAPIRepo, MockCommandAPIRepo>();
             services.AddScoped<ICommandAPIRepo, SqlCommandAPIRepo>();
         }
