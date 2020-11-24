@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 
 namespace CommandAPI
 {
@@ -24,7 +25,10 @@ namespace CommandAPI
         }
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<CommandContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("SqlServerConnection")));
+            var builder = new SqlConnectionStringBuilder(Configuration.GetConnectionString("SqlServerConnection"));
+            builder.UserID = Configuration["user id"];
+            builder.Password = Configuration["password"];
+            services.AddDbContext<CommandContext>(opt => opt.UseSqlServer(builder.ConnectionString));
             services.AddControllers();
             //services.AddScoped<ICommandAPIRepo, MockCommandAPIRepo>();
             services.AddScoped<ICommandAPIRepo, SqlCommandAPIRepo>();
